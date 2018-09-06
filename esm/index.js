@@ -26,16 +26,13 @@ var path = require('path');
 // third parts
 var mkdirp = require('mkdirp');
 
-// base folder
-var name = require('../package.json').name;
-
 function Perseverant(options) {"use strict";
   if (!options) options = {};
-  var folder = options.folder || path.join(HOME, '.' + name);
+  var folder = options.folder || path.join(HOME, '.perseverant');
   this.serializer = options.serializer || JSON;
   this.name = options.name || 'global';
-  if (!/^[a-z0-9_-]+$/i.test(name))
-    throw new Error('Invalid storage name: ' + name);
+  if (!/^[a-z0-9_-]+$/i.test(this.name))
+    throw new Error('Invalid storage name: ' + this.name);
   this.folder = path.join(
     path.isAbsolute(folder) ? folder : path.join(process.cwd(), folder),
     this.name
