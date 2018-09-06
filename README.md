@@ -1,4 +1,4 @@
-# Perseverant
+# Perseverant [![Build Status](https://travis-ci.com/WebReflection/perseverant.svg?branch=master)](https://travis-ci.com/WebReflection/perseverant) [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
 
 An asynchronous, persistent, [localForage](https://github.com/localForage/localForage) inspired, filesystem based storage solution for NodeJS.
 
