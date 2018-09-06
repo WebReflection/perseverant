@@ -1,0 +1,26 @@
+{
+  "name": "perseverant",
+  "version": "0.0.0",
+  "description": "An asynchronous, persistent, localForage inspired, filesystem based storage solution for NodeJS.",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "scripts": {
+    "build": "npm run cjs && npm run esm && npm test",
+    "cjs": "cp index.js cjs/ && echo 'module.exports = new Perseverant({});' >> cjs/index.js",
+    "esm": "cp index.js esm/ && echo 'export default new Perseverant({});' >> esm/index.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "localStorage",
+    "localForage",
+    "persistent",
+    "storage",
+    "async",
+    "node"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "ISC",
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  }
+}
