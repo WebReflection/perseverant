@@ -17,13 +17,13 @@ It is possible to create a new instance with a different serializer, folder, or 
 This is the meta description of the API.
 
 ```js
-const storage = require('perseverant');
-// or import storage from 'perseverant';
+const perseverant = require('perseverant');
+// or import perseverant from 'perseverant';
 
 // by default, the name of the storage is 'global' but
 // it is highly suggested to use your own project name instead
-storage.createInstance('my-project'):Perseverant
-storage.createInstance({
+const storage = perseverant.createInstance('my-project'):Perseverant
+const storage = perseverant.createInstance({
   name,       // by default 'global'
   folder,     // by default HOME/.perseverant
   serializer  // by default JSON
