@@ -5,7 +5,7 @@ interface IPerseverantOptions<TSerializer = typeof JSON> {
    */
   name?: string;
   /**
-   * Name of storage folder. Default is `'HOME/.perseverant'`
+   * Name of storage folder. Default is `'$HOME/.perseverant'`
    */
   folder?: string;
   /**
@@ -68,7 +68,7 @@ declare class Perseverant {
   /**
    * returns all keys
    */
-  keys<TCallbackReturn>(callback: (files: string[]) => TCallbackReturn): Promise<TCallbackReturn>;
+  keys<TCallbackReturn>(callback: (keys: string[]) => TCallbackReturn): Promise<TCallbackReturn>;
   /**
    * returns all keys
    */

@@ -25,7 +25,7 @@ const perseverant = require('perseverant');
 const storage = perseverant.createInstance('my-project'):Perseverant
 const storage = perseverant.createInstance({
   name,       // by default 'global'
-  folder,     // by default HOME/.perseverant
+  folder,     // by default $HOME/.perseverant
   serializer  // by default JSON
 }):Perseverant
 
