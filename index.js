@@ -185,8 +185,9 @@ function error(err) {
 function exec(oninit, callback) {
   return init
           .call(this)
-          .then(oninit, error)
-          .then(callback || noop, error);
+          .then(oninit)
+          .then(callback || noop)
+          .catch(error);
 }
 
 function init() {
@@ -194,7 +195,8 @@ function init() {
   return self._init || (self._init = new Promise(
     function (resolve, reject) {
       fs.stat(self.folder, function (err, stat) {
-        if (isError(err) || (stat && !stat.isDirectory())) reject(err);
+        if (isError(err) || (stat && !stat.isDirectory()))
+          reject(err || new Error('Invalid folder: ' + self.folder));
         else if (err) mkdirp(self.folder, function (err) {
           if (err) reject(err);
           else {
@@ -212,7 +214,7 @@ function init() {
 }
 
 function isError(err) {
-  return err && !/^(?:ENOTDIR|ENOENT)$/.test(err.code);
+  return !!err && !/^(?:ENOTDIR|ENOENT)$/.test(err.code);
 }
 
 function noop(id) {

@@ -8,8 +8,9 @@
   "scripts": {
     "build": "npm run cjs && npm run esm && npm test",
     "cjs": "cp index.js cjs/ && echo 'module.exports = new Perseverant({});' >> cjs/index.js",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "esm": "cp index.js esm/ && echo 'export default new Perseverant({});' >> esm/index.js",
-    "test": "node test.js"
+    "test": "istanbul cover test.js"
   },
   "keywords": [
     "localStorage",
@@ -23,5 +24,9 @@
   "license": "ISC",
   "dependencies": {
     "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.2",
+    "istanbul": "^0.4.5"
   }
 }
