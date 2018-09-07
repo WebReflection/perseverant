@@ -1,4 +1,4 @@
-# Perseverant [![Build Status](https://travis-ci.com/WebReflection/perseverant.svg?branch=master)](https://travis-ci.com/WebReflection/perseverant) [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
+# Perseverant [![Build Status](https://travis-ci.com/WebReflection/perseverant.svg?branch=master)](https://travis-ci.com/WebReflection/perseverant) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/perseverant/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/perseverant?branch=master) [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](https://opensource.org/licenses/ISC)
 
 An asynchronous, persistent, [localForage](https://github.com/localForage/localForage) inspired, filesystem based storage solution for NodeJS.
 
