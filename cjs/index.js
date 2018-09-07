@@ -81,7 +81,11 @@ Object.defineProperties(
             fs.writeFile(
               path.join(folder, asBase64(key)),
               self.serializer.stringify(value),
-              after(resolve, reject, value)
+              function (err) {
+                /* istanbul ignore if */
+                if (err) reject(err);
+                else resolve(value);
+              }
             );
           });
         },
@@ -150,7 +154,8 @@ Object.defineProperties(
             fs.readdir(
               folder,
               function (err, files) {
-                if (isError(err)) reject(err);
+                /* istanbul ignore if */
+                if (err) reject(err);
                 else resolve(files.map(asKey));
               }
             );
@@ -162,11 +167,11 @@ Object.defineProperties(
   }
 );
 
-function after(resolve, reject, value) {
-  var args = arguments.length < 3 ? [] : [value];
+function after(resolve, reject) {
   return function (err) {
+    /* istanbul ignore if */
     if (isError(err)) reject(err);
-    else resolve.apply(null, args);
+    else resolve();
   };
 }
 
@@ -198,6 +203,7 @@ function init() {
         if (isError(err) || (stat && !stat.isDirectory()))
           reject(err || new Error('Invalid folder: ' + self.folder));
         else if (err) mkdirp(self.folder, function (err) {
+          /* istanbul ignore if */
           if (err) reject(err);
           else {
             self._init = null;

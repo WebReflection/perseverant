@@ -55,7 +55,6 @@ storage
                             );
                             try {
                               storage.createInstance({name: 'this throws'});
-                              console.assert(false, 'it should have thrown');
                             } catch(e) {
                               storage.createInstance();
                               const local = storage.createInstance({folder: '.'});
@@ -67,11 +66,8 @@ storage
                                   storage.createInstance({
                                     folder: path.dirname(process.execPath),
                                     name: path.basename(process.execPath)
-                                  }).length().then(
+                                  }).length().catch(
                                     function () {
-                                      console.assert(false, 'it should have failed');
-                                    },
-                                    function (err) {
                                       console.assert(true, 'all good, there is an error');
                                     }
                                   );
