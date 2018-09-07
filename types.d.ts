@@ -63,7 +63,7 @@ declare class Perseverant {
   /**
    * returns the length of keys
    */
-  length(callback?: () => any): Promise<number>;
+  length(callback?: (length: number) => any): Promise<number>;
 
   /**
    * returns all keys
