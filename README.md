@@ -70,7 +70,7 @@ By default, everything is indeed stored as plain JSON, and in a location any oth
 The goal of this project is to provide, specially to NodeJS CLI, a way to persist data in any kind of device.
 
 
-#### Technically speaking
+### Technically speaking
 
   * each key is converted into its _base64_ counterpart, and its value stored via `JSON.stringify`
   * if you provide your own `serializer`, you could even encrypt data while storing, but that's up to you, nothing provided by default.
