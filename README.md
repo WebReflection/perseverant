@@ -27,7 +27,7 @@ const storage = perseverant.createInstance('my-project'):Perseverant
 // or ...
 const storage = perseverant.createInstance({
   name,       // by default 'global'
-  folder,     // by default $HOME/.perseverant
+  folder,     // by default $HOME/.config/perseverant
   serializer  // by default JSON
 }):Perseverant
 

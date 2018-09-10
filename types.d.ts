@@ -5,7 +5,7 @@ interface IPerseverantOptions<TSerializer = typeof JSON> {
    */
   name?: string;
   /**
-   * Name of storage folder. Default is `'$HOME/.perseverant'`
+   * Name of storage folder. Default is `'$HOME/.config/perseverant'`
    */
   folder?: string;
   /**

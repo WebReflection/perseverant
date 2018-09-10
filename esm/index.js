@@ -16,19 +16,26 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-// constants
-var HOME = require('os').userInfo().homedir;
-
 // native
 var fs = require('fs');
+var os = require('os');
 var path = require('path');
+
+// constants
+var HOME =  process.env.XDG_CONFIG_HOME ||
+            path.join(
+              os.homedir() ||
+              /* istanbul ignore next */
+              os.tmpdir(),
+              '.config'
+            );
 
 // third parts
 var mkdirp = require('mkdirp');
 
-function Perseverant(options) {"use strict";
+function Perseverant(options) {'use strict';
   if (!options) options = {};
-  var folder = options.folder || path.join(HOME, '.perseverant');
+  var folder = options.folder || path.join(HOME, 'perseverant');
   this.serializer = options.serializer || JSON;
   this.name = options.name || 'global';
   if (!/^[a-z0-9_-]+$/i.test(this.name))
