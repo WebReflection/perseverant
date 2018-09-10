@@ -1,6 +1,6 @@
 {
   "name": "perseverant",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "description": "An asynchronous, persistent, localForage inspired, filesystem based storage solution for NodeJS.",
   "main": "cjs/index.js",
   "module": "esm/index.js",
