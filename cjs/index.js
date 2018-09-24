@@ -23,6 +23,7 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var crypto, ciphers;
+
 /* istanbul ignore next */
 try {
   crypto = require('crypto');
