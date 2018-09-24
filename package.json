@@ -17,6 +17,7 @@
     "localForage",
     "persistent",
     "storage",
+    "encrypted",
     "async",
     "node"
   ],

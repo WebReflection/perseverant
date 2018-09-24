@@ -16,10 +16,20 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+'use strict';
+
 // native
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
+var crypto, ciphers;
+/* istanbul ignore next */
+try {
+  crypto = require('crypto');
+  ciphers = crypto.getCiphers();
+} catch(NOENCRIPTION) {
+  ciphers = [];
+}
 
 // constants
 var HOME =  process.env.XDG_CONFIG_HOME ||
@@ -33,8 +43,21 @@ var HOME =  process.env.XDG_CONFIG_HOME ||
 // third parts
 var mkdirp = require('mkdirp');
 
+// provates
+var encrypted = new WeakMap;
+
 function Perseverant(options) {'use strict';
   if (!options) options = {};
+  if (options.password != null) {
+    /* istanbul ignore if */
+    if (ciphers.indexOf(options.cipher || 'aes256') < 0)
+      throw new Error('Invalid cipher: ' + options.cipher);
+    encrypted.set(this, {
+      password: String(options.password),
+      cipher: options.cipher || 'aes256'
+    });
+    this.encrypted = true;
+  }
   var folder = options.folder || path.join(HOME, 'perseverant');
   this.serializer = options.serializer || JSON;
   this.name = options.name || 'global';
@@ -66,10 +89,21 @@ Object.defineProperties(
         function (folder) {
           return new Promise(function (resolve) {
             fs.readFile(
-              path.join(folder, asBase64(key)),
+              path.join(
+                folder,
+                self.encrypted ? encrypt(self, key) : asBase64(key)
+              ),
               function (err, buffer) {
-                if (err) resolve(null);
-                else resolve(self.serializer.parse(buffer));
+                if (err)
+                  resolve(null);
+                else
+                  resolve(
+                    self.serializer.parse(
+                      self.encrypted ?
+                        decrypt(self, buffer) :
+                        buffer
+                    )
+                  );
               }
             );
           });
@@ -86,8 +120,14 @@ Object.defineProperties(
         function (folder) {
           return new Promise(function (resolve, reject) {
             fs.writeFile(
-              path.join(folder, asBase64(key)),
-              self.serializer.stringify(value),
+              path.join(
+                folder,
+                self.encrypted ? encrypt(self, key) : asBase64(key)
+              ),
+              self.encrypted ?
+                encrypt(self, self.serializer.stringify(value)) :
+                self.serializer.stringify(value)
+              ,
               function (err) {
                 /* istanbul ignore if */
                 if (err) reject(err);
@@ -102,12 +142,16 @@ Object.defineProperties(
 
     // .removeItem(key[, callback]):Promise
     removeItem:{value: function (key, callback) {
+      var self = this;
       return exec.call(
-        this,
+        self,
         function (folder) {
           return new Promise(function (resolve, reject) {
             fs.unlink(
-              path.join(folder, asBase64(key)),
+              path.join(
+                folder,
+                self.encrypted ? encrypt(self, key) : asBase64(key)
+              ),
               after(resolve, reject)
             );
           });
@@ -154,8 +198,9 @@ Object.defineProperties(
 
     // .keys([callback]):Promise(keys)
     keys:{value: function (callback) {
+      var self = this;
       return exec.call(
-        this,
+        self,
         function (folder) {
           return new Promise(function (resolve, reject) {
             fs.readdir(
@@ -163,7 +208,7 @@ Object.defineProperties(
               function (err, files) {
                 /* istanbul ignore if */
                 if (err) reject(err);
-                else resolve(files.map(asKey));
+                else resolve(files.map(asKey, self));
               }
             );
           });
@@ -186,8 +231,24 @@ function asBase64(key) {
   return Buffer.from(key).toString('base64');
 }
 
-function asKey(base64) {
-  return Buffer.from(base64, 'base64').toString();
+function asKey(fileName) {
+  return this.encrypted ?
+          decrypt(this, fileName) :
+          Buffer.from(fileName, 'base64').toString();
+}
+
+function decrypt(self, buffer) {
+  var info = encrypted.get(self);
+  var decipher = crypto.createDecipher(info.cipher, info.password);
+  return (decipher.update(String(buffer), 'hex', 'utf8') +
+          decipher.final('utf8'));
+}
+
+function encrypt(self, buffer) {
+  var info = encrypted.get(self);
+  var cipher = crypto.createCipher(info.cipher, info.password);
+  return (cipher.update(buffer, 'utf8', 'hex') +
+          cipher.final('hex'));
 }
 
 function error(err) {

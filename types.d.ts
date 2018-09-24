@@ -12,6 +12,15 @@ interface IPerseverantOptions<TSerializer = typeof JSON> {
    * Serializer / Derserializer. Default is `JSON`
    */
   serializer?: TSerializer;
+  /**
+   * Enable key/value encryption through a password
+   */
+  password?: string;
+  /**
+   * If there is a password, it specifies the algorithm to use.
+   * Default is `"aes256"`
+   */
+  cipher?: string;
 }
 
 declare class Perseverant {
