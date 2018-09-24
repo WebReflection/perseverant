@@ -5,11 +5,11 @@ An asynchronous, persistent, [localForage](https://github.com/localForage/localF
 
 ### Concept
 
-Each key will be stored as regular file with serialized data.
+Each key will be stored as regular file with optionally encrypted serialized data.
 
 By default, everything is kept super simple so whatever value will be saved as JSON.
 
-It is possible to create a new instance with a different name, folder, or serializer.
+It is possible to create a new instance with a different name, folder, encryption or serialization.
 
 
 ### API
@@ -28,7 +28,10 @@ const storage = perseverant.createInstance('my-project'):Perseverant
 const storage = perseverant.createInstance({
   name,       // by default 'global'
   folder,     // by default $HOME/.config/perseverant
-  serializer  // by default JSON
+  serializer, // by default JSON
+  password,   // if provided, it's used to encrypt
+  cipher      // if there is a password is used as cipher
+              // by default it's aes256
 }):Perseverant
 
 // retrieve a key (read key file)
@@ -63,7 +66,18 @@ storage.keys([callback(keys[])]):Promise<keys[]>
 
 ### Things to consider
 
-This project is not a database replacement, neither a secure way to store credentials, passwords, or any relevant data.
+This project is not a database replacement, neither a secure way to store credentials, passwords, or any relevant data if you do not provide at least a password.
+
+```js
+// insecure!
+const storage = require('perseverant');
+
+// secure \o/
+const storage = require('perseverant').createInstance({
+  name: process.env.APP_NAME,
+  password: process.env.APP_SECRET
+});
+```
 
 By default, everything is indeed stored as plain JSON, and in a location any other software can reach.
 
@@ -72,7 +86,5 @@ The goal of this project is to provide, specially to NodeJS CLI, a way to persis
 
 ### Technically speaking
 
-  * each key is converted into its _base64_ counterpart, and its value stored via `JSON.stringify`
-  * if you provide your own `serializer`, you could even encrypt data while storing, but that's up to you, nothing provided by default.
+  * each key is converted into its _base64_ or encrypted counterpart, and its value stored via `JSON.stringify`
   * if you provide your own `serializer`, you can also store [recursive data](https://github.com/WebReflection/flatted#flatted) or buffers and binaries, currently not supported in core (to keep it simple) 
-
