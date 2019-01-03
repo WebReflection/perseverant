@@ -22,12 +22,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>104/104</span>
+        <span class='fraction'>94/94</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>65/65</span>
+        <span class='fraction'>61/61</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -37,10 +37,10 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>98/98</span>
+        <span class='fraction'>88/88</span>
       </div>
       <div class='fl pad1y'>
-        <span class="strong">6 statements, 6 branches</span>
+        <span class="strong">4 statements, 5 branches</span>
         <span class="quiet">Ignored</span>  &nbsp;&nbsp;&nbsp;&nbsp;
       </div>
     </div>
@@ -333,19 +333,7 @@
 284
 285
 286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298
-299</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+287</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -369,15 +357,8 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -397,10 +378,11 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">12×</span>
 <span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -587,16 +569,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">9×</span>
-<span class="cline-any cline-yes">9×</span>
-<span class="cline-any cline-yes">9×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -620,15 +596,15 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">28×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24×</span>
-<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-yes">25×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -667,15 +643,8 @@
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
-var crypto, ciphers;
 &nbsp;
-/* istanbul ignore next */
-try {
-  crypto = require('crypto');
-  ciphers = crypto.getCiphers();
-} catch(NOENCRIPTION) {
-<span class="cstat-skip" title="statement not covered" >  ciphers = [];</span>
-}
+var Secret = require('secretly');
 &nbsp;
 // constants
 var HOME =  process.env.XDG_CONFIG_HOME ||
@@ -694,14 +663,15 @@ var encrypted = new WeakMap;
 &nbsp;
 function Perseverant(options) {'use strict';
   if (!options) options = {};
-  if (options.password != null) {
-    /* istanbul ignore if */
-    <span class="skip-if-branch" title="if path not taken" >I</span>if (ciphers.indexOf(options.cipher || 'aes256') &lt; 0)
-<span class="cstat-skip" title="statement not covered" >      throw new Error('Invalid cipher: ' + options.cipher);</span>
-    encrypted.set(this, {
-      password: String(options.password),
-      cipher: options.cipher || 'aes256'
-    });
+  if (options.password) {
+    encrypted.set(
+      this,
+      new Secret(
+        options.password,
+        options.salt || 'perseverant',
+        false
+      )
+    );
     this.encrypted = true;
   }
   var folder = options.folder || path.join(HOME, 'perseverant');
@@ -884,17 +854,11 @@ function asKey(fileName) {
 }
 &nbsp;
 function decrypt(self, buffer) {
-  var info = encrypted.get(self);
-  var decipher = crypto.createDecipher(info.cipher, info.password);
-  return (decipher.update(String(buffer), 'hex', 'utf8') +
-          decipher.final('utf8'));
+  return encrypted.get(self).decrypt(buffer);
 }
 &nbsp;
 function encrypt(self, buffer) {
-  var info = encrypted.get(self);
-  var cipher = crypto.createCipher(info.cipher, info.password);
-  return (cipher.update(buffer, 'utf8', 'hex') +
-          cipher.final('hex'));
+  return encrypted.get(self).encrypt(buffer);
 }
 &nbsp;
 function error(err) {
@@ -947,7 +911,7 @@ module.exports = new Perseverant({});
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Sep 24 2018 17:34:46 GMT+0100 (BST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jan 03 2019 14:26:38 GMT+0100 (CET)
 </div>
 </div>
 <script src="../../prettify.js"></script>

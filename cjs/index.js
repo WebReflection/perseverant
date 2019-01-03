@@ -22,15 +22,8 @@
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
-var crypto, ciphers;
 
-/* istanbul ignore next */
-try {
-  crypto = require('crypto');
-  ciphers = crypto.getCiphers();
-} catch(NOENCRIPTION) {
-  ciphers = [];
-}
+var Secret = require('secretly');
 
 // constants
 var HOME =  process.env.XDG_CONFIG_HOME ||
@@ -49,14 +42,15 @@ var encrypted = new WeakMap;
 
 function Perseverant(options) {'use strict';
   if (!options) options = {};
-  if (options.password != null) {
-    /* istanbul ignore if */
-    if (ciphers.indexOf(options.cipher || 'aes256') < 0)
-      throw new Error('Invalid cipher: ' + options.cipher);
-    encrypted.set(this, {
-      password: String(options.password),
-      cipher: options.cipher || 'aes256'
-    });
+  if (options.password) {
+    encrypted.set(
+      this,
+      new Secret(
+        options.password,
+        options.salt || 'perseverant',
+        false
+      )
+    );
     this.encrypted = true;
   }
   var folder = options.folder || path.join(HOME, 'perseverant');
@@ -239,17 +233,11 @@ function asKey(fileName) {
 }
 
 function decrypt(self, buffer) {
-  var info = encrypted.get(self);
-  var decipher = crypto.createDecipher(info.cipher, info.password);
-  return (decipher.update(String(buffer), 'hex', 'utf8') +
-          decipher.final('utf8'));
+  return encrypted.get(self).decrypt(buffer);
 }
 
 function encrypt(self, buffer) {
-  var info = encrypted.get(self);
-  var cipher = crypto.createCipher(info.cipher, info.password);
-  return (cipher.update(buffer, 'utf8', 'hex') +
-          cipher.final('hex'));
+  return encrypted.get(self).encrypt(buffer);
 }
 
 function error(err) {

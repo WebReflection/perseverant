@@ -23,7 +23,8 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "dependencies": {
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "secretly": "^0.2.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
