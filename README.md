@@ -30,8 +30,8 @@ const storage = perseverant.createInstance({
   folder,     // by default $HOME/.config/perseverant
   serializer, // by default JSON
   password,   // if provided, it's used to encrypt
-  cipher      // if there is a password is used as cipher
-              // by default it's aes256
+  salt        // if there is a password is used as salt
+              // by default it's perseverant
 }):Perseverant
 
 // retrieve a key (read key file)
