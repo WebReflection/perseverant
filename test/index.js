@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var storage = require('./cjs');
+var storage = require('../cjs');
 var invokes = [];
 
 (function test(storage) {
@@ -60,7 +60,7 @@ var invokes = [];
                               } catch(e) {
                                 storage.createInstance();
                                 const local = storage.createInstance({folder: '.'});
-                                console.assert(local.folder === path.join(__dirname, 'global'), 'expected folder');
+                                console.assert(local.folder === path.join(__dirname, '..', 'global'), 'expected folder');
                                 local.length().then(function (value) {
                                   console.assert(value === 0, 'no keys in the local folder');
                                   local.clear().then(function () {

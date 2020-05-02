@@ -2,15 +2,19 @@
   "name": "perseverant",
   "version": "3.0.0",
   "description": "An asynchronous, persistent, localForage inspired, filesystem based storage solution for NodeJS.",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "type": "module",
+  "exports": {
+    "import": "./esm/index.js",
+    "default": "./cjs/index.js"
+  },
   "types": "types.d.ts",
   "scripts": {
-    "build": "npm run cjs && npm run esm && npm test",
-    "cjs": "cp index.js cjs/ && echo 'module.exports = new Perseverant({});' >> cjs/index.js",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "esm": "cp index.js esm/ && echo 'export default new Perseverant({});' >> esm/index.js",
-    "test": "istanbul cover test.js"
+    "build": "npm run cjs && npm run test",
+    "cjs": "ascjs --no-default esm cjs",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test": "nyc node test/index.js"
   },
   "keywords": [
     "localStorage",
@@ -23,11 +27,11 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "dependencies": {
-    "mkdirp": "^0.5.1",
-    "secretly": "^0.2.0"
+    "secretly": "^1.0.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.2",
-    "istanbul": "^0.4.5"
+    "ascjs": "^4.0.0",
+    "coveralls": "^3.1.0",
+    "nyc": "^15.0.1"
   }
 }

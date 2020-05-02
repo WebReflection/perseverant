@@ -1,3 +1,4 @@
+'use strict';
 /*!
  * ISC License
  *
@@ -16,214 +17,186 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-'use strict';
+const {mkdir, readdir, readFile, rmdir, stat, unlink, writeFile} = require('fs');
+const {homedir, tmpdir} = require('os');
+const {cwd, env} = require('process');
+const {isAbsolute, join} = require('path');
 
-// native
-var fs = require('fs');
-var os = require('os');
-var path = require('path');
-
-var Secret = require('secretly');
+const Secretly = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('secretly'));
 
 // constants
-var HOME =  process.env.XDG_CONFIG_HOME ||
-            path.join(
-              os.homedir() ||
-              /* istanbul ignore next */
-              os.tmpdir(),
-              '.config'
-            );
+const HOME =  env.XDG_CONFIG_HOME ||
+              join(
+                homedir() ||
+                /* istanbul ignore next */
+                tmpdir(),
+                '.config'
+              );
 
-// third parts
-var mkdirp = require('mkdirp');
+// helpers
+const after = (resolve, reject) => err => {
+  /* istanbul ignore if */
+  if (isError(err)) reject(err);
+  else resolve();
+};
+const asBase64 = key => Buffer.from(key).toString('base64');
+const decrypt = (self, buffer) => encrypted.get(self).decrypt(buffer);
+const encrypt = (self, buffer) => encrypted.get(self).encrypt(buffer);
+const error = err => { throw err; };
+const isError = err => (!!err && !/^(?:ENOTDIR|ENOENT)$/.test(err.code));
+const noop = id => id;
 
-// provates
-var encrypted = new WeakMap;
+// privates
+const encrypted = new WeakMap;
 
-function Perseverant(options) {'use strict';
-  if (!options) options = {};
-  if (options.password) {
-    encrypted.set(
-      this,
-      new Secret(
-        options.password,
-        options.salt || 'perseverant',
-        false
-      )
+class Perseverant {
+  constructor(options = {}) {
+    if (options.password) {
+      encrypted.set(
+        this,
+        new Secretly(
+          options.password,
+          options.salt || 'perseverant',
+          false
+        )
+      );
+      this.encrypted = true;
+    }
+    const folder = options.folder || join(HOME, 'perseverant');
+    this.serializer = options.serializer || JSON;
+    this.name = options.name || 'global';
+    if (!/^[a-z0-9_-]+$/i.test(this.name))
+      throw new Error('Invalid storage name: ' + this.name);
+    this.folder = join(
+      isAbsolute(folder) ? folder : join(cwd(), folder),
+      this.name
     );
-    this.encrypted = true;
+    this._init = null;
   }
-  var folder = options.folder || path.join(HOME, 'perseverant');
-  this.serializer = options.serializer || JSON;
-  this.name = options.name || 'global';
-  if (!/^[a-z0-9_-]+$/i.test(this.name))
-    throw new Error('Invalid storage name: ' + this.name);
-  this.folder = path.join(
-    path.isAbsolute(folder) ? folder : path.join(process.cwd(), folder),
-    this.name
-  );
-  this._init = null;
-}
 
-Object.defineProperties(
-  Perseverant.prototype,
-  {
-    // .createInstance('name'):Perseverant
-    // .createInstance({name, folder, serializer}):Perseverant
-    createInstance: {value: function (options) {
-      return new Perseverant(
-        typeof options === 'string' ? {name: options} : options
-      );
-    }},
+  // .createInstance('name'):Perseverant
+  // .createInstance({name, folder, serializer}):Perseverant
+  createInstance(options) {
+    return new Perseverant(
+      typeof options === 'string' ? {name: options} : options
+    );
+  }
 
-    // .getItem(key[, callback]):Promise(value)
-    getItem:{value: function (key, callback) {
-      var self = this;
-      return exec.call(
-        self,
-        function (folder) {
-          return new Promise(function (resolve) {
-            fs.readFile(
-              path.join(
-                folder,
-                self.encrypted ? encrypt(self, key) : asBase64(key)
-              ),
-              function (err, buffer) {
-                if (err)
-                  resolve(null);
-                else
-                  resolve(
-                    self.serializer.parse(
-                      self.encrypted ?
-                        decrypt(self, buffer) :
-                        buffer
-                    )
-                  );
-              }
-            );
-          });
-        },
-        callback
-      );
-    }},
+  // .getItem(key[, callback]):Promise(value)
+  getItem(key, callback) {
+    return exec.call(
+      this,
+      folder => new Promise(resolve => {
+        readFile(
+          join(
+            folder,
+            this.encrypted ? encrypt(this, key) : asBase64(key)
+          ),
+          (err, buffer) => {
+            if (err)
+              resolve(null);
+            else
+              resolve(
+                this.serializer.parse(
+                  this.encrypted ?
+                    decrypt(this, buffer) :
+                    buffer
+                )
+              );
+          }
+        );
+      }),
+      callback
+    );
+  }
 
-    // .setItem(key, value[, callback]):Promise(value)
-    setItem:{value: function (key, value, callback) {
-      var self = this;
-      return exec.call(
-        self,
-        function (folder) {
-          return new Promise(function (resolve, reject) {
-            fs.writeFile(
-              path.join(
-                folder,
-                self.encrypted ? encrypt(self, key) : asBase64(key)
-              ),
-              self.encrypted ?
-                encrypt(self, self.serializer.stringify(value)) :
-                self.serializer.stringify(value)
-              ,
-              function (err) {
-                /* istanbul ignore if */
-                if (err) reject(err);
-                else resolve(value);
-              }
-            );
-          });
-        },
-        callback
-      );
-    }},
+  // .setItem(key, value[, callback]):Promise(value)
+  setItem(key, value, callback) {
+    return exec.call(
+      this,
+      folder => new Promise((resolve, reject) => {
+        writeFile(
+          join(
+            folder,
+            this.encrypted ? encrypt(this, key) : asBase64(key)
+          ),
+          this.encrypted ?
+            encrypt(this, this.serializer.stringify(value)) :
+            this.serializer.stringify(value)
+          ,
+          err => {
+            /* istanbul ignore if */
+            if (err) reject(err);
+            else resolve(value);
+          }
+        );
+      }),
+      callback
+    );
+  }
 
-    // .removeItem(key[, callback]):Promise
-    removeItem:{value: function (key, callback) {
-      var self = this;
-      return exec.call(
-        self,
-        function (folder) {
-          return new Promise(function (resolve, reject) {
-            fs.unlink(
-              path.join(
-                folder,
-                self.encrypted ? encrypt(self, key) : asBase64(key)
-              ),
-              after(resolve, reject)
-            );
-          });
-        },
-        callback
-      );
-    }},
+  // .removeItem(key[, callback]):Promise
+  removeItem(key, callback) {
+    return exec.call(
+      this,
+      folder => new Promise((resolve, reject) => {
+        unlink(
+          join(
+            folder,
+            this.encrypted ? encrypt(this, key) : asBase64(key)
+          ),
+          after(resolve, reject)
+        );
+      }),
+      callback
+    );
+  }
 
-    // .clear([callback]):Promise
-    clear:{value: function (callback) {
-      var self = this;
-      return exec.call(
-        self,
-        function (folder) {
-          return self.keys().then(function (keys) {
-            return Promise.all(keys.map(function (key) {
-              return self.removeItem(key);
-            }));
-          })
-          .then(
-            function () {
-              return new Promise(function (resolve, reject) {
-                fs.rmdir(folder, after(resolve, reject));
-              });
-            },
-            error
-          );
-        },
-        callback
-      );
-    }},
-
-    // .length([callback]):Promise(length)
-    length:{value: function (callback) {
-      return this.keys().then(
-        function (keys) {
-          var length = keys.length;
-          (callback || noop)(length);
-          return length;
-        } ,
+  // .clear([callback]):Promise
+  clear(callback) {
+    return exec.call(
+      this,
+      folder => this.keys().then(
+        keys => Promise.all(keys.map(key => this.removeItem(key)))
+      )
+      .then(
+        () => new Promise((resolve, reject) => {
+          rmdir(folder, after(resolve, reject));
+        }),
         error
-      );
-    }},
-
-    // .keys([callback]):Promise(keys)
-    keys:{value: function (callback) {
-      var self = this;
-      return exec.call(
-        self,
-        function (folder) {
-          return new Promise(function (resolve, reject) {
-            fs.readdir(
-              folder,
-              function (err, files) {
-                /* istanbul ignore if */
-                if (err) reject(err);
-                else resolve(files.map(asKey, self));
-              }
-            );
-          });
-        },
-        callback
-      );
-    }}
+      ),
+      callback
+    );
   }
-);
 
-function after(resolve, reject) {
-  return function (err) {
-    /* istanbul ignore if */
-    if (isError(err)) reject(err);
-    else resolve();
-  };
-}
+  // .length([callback]):Promise(length)
+  length(callback) {
+    return this.keys().then(
+      ({length}) => {
+        (callback || noop)(length);
+        return length;
+      },
+      error
+    );
+  }
 
-function asBase64(key) {
-  return Buffer.from(key).toString('base64');
+  // .keys([callback]):Promise(keys)
+  keys(callback) {
+    return exec.call(
+      this,
+      folder => new Promise((resolve, reject) => {
+        readdir(
+          folder,
+          (err, files) => {
+            /* istanbul ignore if */
+            if (err) reject(err);
+            else resolve(files.map(asKey, this));
+          }
+        );
+      }),
+      callback
+    );
+  }
 }
 
 function asKey(fileName) {
@@ -232,55 +205,38 @@ function asKey(fileName) {
           Buffer.from(fileName, 'base64').toString();
 }
 
-function decrypt(self, buffer) {
-  return encrypted.get(self).decrypt(buffer);
-}
-
-function encrypt(self, buffer) {
-  return encrypted.get(self).encrypt(buffer);
-}
-
-function error(err) {
-  throw err;
-}
-
-function exec(oninit, callback) {
+function exec(onInit, callback) {
   return init
           .call(this)
-          .then(oninit)
+          .then(onInit)
           .then(callback || noop)
           .catch(error);
 }
 
 function init() {
-  var self = this;
+  const self = this;
+  const {folder} = self;
   return self._init || (self._init = new Promise(
-    function (resolve, reject) {
-      fs.stat(self.folder, function (err, stat) {
+    (resolve, reject) => {
+      stat(folder, (err, stat) => {
         if (isError(err) || (stat && !stat.isDirectory()))
-          reject(err || new Error('Invalid folder: ' + self.folder));
-        else if (err) mkdirp(self.folder, function (err) {
-          /* istanbul ignore if */
-          if (err) reject(err);
-          else {
-            self._init = null;
-            resolve(self.folder);
-          }
-        });
+          reject(err || new Error('Invalid folder: ' + folder));
+        else if (err)
+          mkdir(folder, {recursive: true}, (err) => {
+            /* istanbul ignore if */
+            if (err) reject(err);
+            else {
+              self._init = null;
+              resolve(folder);
+            }
+          });
         else {
           self._init = null;
-          resolve(self.folder);
+          resolve(folder);
         }
       });
     }
   ));
 }
 
-function isError(err) {
-  return !!err && !/^(?:ENOTDIR|ENOENT)$/.test(err.code);
-}
-
-function noop(id) {
-  return id;
-}
-module.exports = new Perseverant({});
+module.exports = new Perseverant;
